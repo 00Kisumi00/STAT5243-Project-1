@@ -4,8 +4,9 @@ This is repository for Columbia University STAT GR2543 Project 1
 
 **Course:** STAT5243 — Project 1
 **Dataset:** IBM job postings (web-scraped)
-**Team Members:** Kevin Ma, Shuzhi Yang, Baixuan Chen, Carrie Feng
+**Team Members:** Kevin Ma, Shuzhi Yang, Baixuan Chen, Carrie Yan Yin Feng
 **Date:** Feb 2026
+**Github Link:** https://github.com/00Kisumi00/STAT5243-Project-1/tree/main
 
 ---
 
@@ -140,6 +141,12 @@ Salary ranges were often wide:
 
 Interpretation: compensation is right-skewed and varies strongly by role class and seniority.
 
+**Mid-salary Distribution Histogram**
+![Mid-salary Distribution](images/midsalaryhist.png)
+
+**Mid-salary Distribution Boxplot**
+![Mid-salary Distribution](images/midsalarybox.png)
+
 ### 4.2 Job Type Composition
 
 Posting counts by `position_type`:
@@ -150,6 +157,9 @@ Posting counts by `position_type`:
 * **Administration & Technician:** 10
 
 Interpretation: IBM postings in this scrape are dominated by professional roles, but internships and entry-level roles are also well represented, which creates a broad salary spread.
+
+**Job Type Categories**
+![Job Type Categories](images/jobtype.png)
 
 ### 4.3 Salary by Position Type
 
@@ -162,14 +172,28 @@ Median midpoint salary by type:
 
 Interpretation: compensation differences across posting type are large and consistent with expected labor market structure.
 
+**Mid-salary By Position**
+![Mid-salary By Position](images/midsalaryposition.png)
+
 ### 4.4 Area of Work Insights
 
 Most common `area_of_work` categories included Consulting, Software Engineering, and Infrastructure & Technology. Salary medians varied substantially across these categories, suggesting job function is an important explanatory variable.
+
+**Area of Work Insights**
+![Area of Work Insights](images/workarea.png)
 
 ### 4.5 Location Field Complexity
 
 The `state_province` column often included **multiple states** in one row (e.g., “Texas, Massachusetts, California”), which indicates flexible or multi-location postings. This motivated our later feature engineering on location structure.
 
+**Location Field**
+![Location Field](images/locationfield.png)
+
+### 4.6 Posting Date Trends
+
+We also examined how postings are distributed over time using date_posted. This helps verify that our scrape covers a coherent time window and can reveal short-term hiring patterns.
+
+Overall, postings appear clustered in certain weeks/months, suggesting hiring activity is not uniform over time. This motivated our feature engineering step that converts posting dates into calendar features (e.g., month, day-of-week).
 ---
 
 ## 5. Feature Engineering Process and Justification (Carrie Feng)
@@ -187,6 +211,9 @@ Feature engineering focuses on **creating meaningful new variables** that captur
 * `salary_range_pct` = (max − min) / mid_salary
 * `min_to_max_ratio` = min / max
 * `log_mid_salary` = log(mid_salary)
+
+**Log_mid_salary**
+![Log_mid_salary](images/logmidsalary.png)
 
 **Why this helps:**
 Range width can proxy how flexible the role level is, and log transforms reduce skew and improve robustness for future modeling.
@@ -243,6 +270,9 @@ More selective roles may correlate with higher compensation and different job fa
 **Why this helps:**
 These features are interpretable, strong predictors of pay, and reduce the need for manual labeling.
 
+**Seniority**
+![Seniority](images/seniority.png)
+
 ### 5.6 Skills + Experience from Text (Advanced unstructured feature extraction)
 
 **Problem:** `preferred_technical_experience` is unstructured text.
@@ -256,6 +286,8 @@ These features are interpretable, strong predictors of pay, and reduce the need 
 **Why this helps:**
 It converts qualitative requirements into quantitative features, enabling analysis like “how do cloud/ML skill mentions relate to salary?”
 
+**Number of Skills**
+![Number of skills](images/skillsnumber.png)
 ---
 
 ## 6. Summary of Key Findings
@@ -289,7 +321,7 @@ It converts qualitative requirements into quantitative features, enabling analys
 
 ## 8. Each Member’s Contribution
 
-* **Kevin Ma — Data Acquisition & Initial Cleaning**
+* **Kevin Ma — Data Acquisition & Cleaning**
 
   * Web scraping IBM job postings
   * Compiled raw dataset into CSV
@@ -298,11 +330,11 @@ It converts qualitative requirements into quantitative features, enabling analys
 * **Shuzhi Yang — Exploratory Data Analysis (EDA)**
 
   * Conducted summary statistics and visual exploration
-  * Identified key distributions and relationships (salary vs job type, job function, location complexity)
+  * Identified key distributions and relationships
 
 * **Baixuan Chen — Preprocessing**
 
-  * Implemented preprocessing workflow: handling missingness, type conversions, and preparing variables for downstream modeling (encoding/scaling readiness)
+  * Implemented preprocessing workflow
 
 * **Carrie Yan Yin Feng — Feature Engineering & Written Report**
 
