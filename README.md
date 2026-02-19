@@ -221,7 +221,7 @@ Interpretation: compensation differences across posting type are large and consi
 **Mid-salary By Position**
 ![Mid-salary By Position](images/midsalaryposition.png)
 
-The median midpoint gap between Professional (~$174k) and Internship (~$104k) postings is large enough that “level/seniority” is likely a primary driver of pay differences. This motivated our title-based seniority features to capture level signal even when position_type is broad. 
+The median midpoint gap between Professional (around $174k) and Internship (around $104k) postings is large enough that “level/seniority” is likely a primary driver of pay differences. This motivated our title-based seniority features to capture level signal even when position_type is broad. 
 
 ### 4.4 Area of Work Insights
 
