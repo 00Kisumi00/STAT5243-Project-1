@@ -10,13 +10,26 @@ This is repository for Columbia University STAT GR2543 Project 1
 
 ---
 
+## Repository structure (what each file does)
+
+ibm_scraping.ipynb: Web scraping notebook used to collect IBM job postings and export the raw CSV.
+
+ibm_jobs.csv: Scraping output (raw dataset) used as the starting point for cleaning and analysis.
+
+Project_1(EDA added).ipynb: Full analysis pipeline notebook (cleaning → preprocessing → EDA → feature engineering) and figure generation.
+
+README.md: Written report summarizing methodology, results, and takeaways; includes figures exported from the notebook.
+
+--- 
+
 ## 1. Introduction and Dataset Description
 
-In the rapidly evolving 2026 tech landscape, job postings are more than just advertisements—they are a data-rich reflection of a company's strategic priorities. This project constructs an end-to-end pipeline to analyze 478 IBM job postings. Our goal was to transform 'unstructured corporate noise'—messy strings of multi-state locations and dense technical requirements—into a high-signal dataset. By engineering features like salary midpoints and technical skill flags, we aim to reveal the underlying correlations between educational requirements and compensation tiers at IBM. 
+In the rapidly evolving 2026 tech landscape, job postings are more than just advertisements, they are a data-rich reflection of a company's strategic priorities. Job postings are semi-structured: some fields (salary bands, dates) look numeric but arrive as messy strings, and other fields (technical experience) are free text. In this project, we scraped 478 IBM job postings and built a reproducible pipeline to convert raw postings into an analysis-ready dataset. Our analysis focuses on how compensation varies by posting type (professional, entry level, internship), job family, and skill requirements, and we use feature engineering to turn multi-location fields and unstructured text into measurable signals.
+
 
 ### 1.1 Dataset Overview
 
-The primary challenge was the 'Multi-Location Paradox.' Many IBM roles are not tied to a single office but list multiple states (e.g., 'Illinois, Texas, Indiana, New Jersey') in a single string. Treating these as unique categories would have led to massive data sparsity. We solved this by parsing these strings to count the 'State Breadth' of a role, transforming a messy text field into a numeric indicator of geographic flexibility—a key signal for modern remote-hybrid work models.
+A major data issue was that many postings listed multiple states in one row (e.g., “Texas, Massachusetts, California”). Treating each full string as a category would create sparse, hard-to-interpret location groups, so we engineered features that capture (1) how many states were listed and (2) a coarse region for comparison.
 
 **Shape:** 478 rows × 11 columns
 
@@ -57,6 +70,9 @@ This acquisition approach satisfies the project requirement to obtain data from 
 
 **Scraping Output Snapshot**
 ![Scrap Output Snapshot](images/scrap.png)
+This snapshot demonstrates why web scraping was necessary: key variables (salary ranges, education, and technical experience) are not provided as a clean dataset and must be collected from individual job pages. The result is realistic “messy data”: inconsistent formatting, missing optional fields, and multi-value location strings that require cleaning and feature engineering downstream. 
+
+
 ### 2.2 Acquisition Challenges (and how we handled them)
 
 * **Pagination / repeated listings:** Web job portals often show repeating listings across pages. We relied on `job_id` as a stable key for deduplication downstream.
@@ -67,7 +83,7 @@ This acquisition approach satisfies the project requirement to obtain data from 
 
 ## 3. Cleaning and Preprocessing Steps
 
-This section documents the work required to turn raw scraped output into consistent, analysis-ready tables. The assignment explicitly emphasizes detecting inconsistencies, enforcing uniform formatting, handling duplicates, outliers, and missingness. 
+The raw data was a landscape of inconsistencies that initially blinded our analysis. We encountered a 'Trial by Fire' with IBM's salary and location fields. For instance, salaries were trapped in strings with decorative characters (commas, currency symbols), and locations often contained multi-state strings like 'Illinois, Texas, Indiana.' We didn't just 'clean' this; we restructured it. By parsing these multi-state strings into 'n_states_listed,' we uncovered that IBM often casts a wide geographical net for specific roles—a discovery that would have been lost if we had simply deleted the duplicates. 
 
 ### 3.1 Cleaning (Kevin Ma)
 
@@ -78,6 +94,8 @@ This section documents the work required to turn raw scraped output into consist
 **Duplicates Removed**
 ![Duplicates Removed](images/duplicates.png)
 
+Deduplicating by job_id prevents repeated postings from inflating counts in EDA (e.g., role frequency, location frequency). This matters because later comparisons (salary by role type, skill flags) assume each row is a unique job posting, not a repeated listing.
+
 * **Uniform formatting:** Trimmed whitespace in string fields to avoid category fragmentation (e.g., `"Texas"` vs `" Texas"`).
 * **Type correction:** Converted salary fields stored as strings into numeric values; parsed `date_posted` into a datetime.
 * **Missing value handling (baseline):**
@@ -86,6 +104,8 @@ This section documents the work required to turn raw scraped output into consist
 
 **Salary fields cleaned**
 ![Salary fields cleaned](images/minvsmax.png)
+
+Cleaning salary strings into numeric fields is the foundation for all later analysis. After cleaning, we verified basic consistency (e.g., max_salary is not less than min_salary), which increases confidence that downstream features like mid_salary and salary_range reflect real compensation bands rather than parsing errors.
 
 ### 3.2 Preprocessing (Baixuan Chen)
 
@@ -118,6 +138,8 @@ This confirms the dataset contains meaningful real-world incompleteness—especi
 
 **Data Overview**
 ![Data Overview](images/data overview.png)
+This missingness is not random “noise” — it reflects how companies selectively disclose preferences. Because of that, we preserved missingness intentionally (instead of dropping rows), and later engineered indicators such as has_preferred_edu_specified and safe text handling (empty strings) so models and group comparisons can treat “missing” as meaningful.
+
 ---
 
 ## 4. Exploratory Data Analysis (EDA)
@@ -146,7 +168,8 @@ Interpretation: compensation is right-skewed and varies strongly by role class a
 
 **Mid-salary Distribution Boxplot**
 ![Mid-salary Distribution](images/midsalarybox.png)
-Because salary is strongly right-skewed, we later engineered a log salary feature (log_mid_salary) to stabilize scale and make relationships easier to compare across groups.
+
+Takeaway: salary is strongly right-skewed (a small number of high-pay roles stretch the distribution), which is why we later engineered log_mid_salary for more stable comparisons across job groups.
 
 ### 4.2 Job Type Composition
 
@@ -176,7 +199,7 @@ Interpretation: compensation differences across posting type are large and consi
 **Mid-salary By Position**
 ![Mid-salary By Position](images/midsalaryposition.png)
 
-The large gaps between Professional vs Internship/Entry Level suggested that seniority/level signals are critical—motivating our feature engineering that extracts seniority markers directly from job titles.
+The median midpoint gap between Professional (~$174k) and Internship (~$104k) postings is large enough that “level/seniority” is likely a primary driver of pay differences. This motivated our title-based seniority features to capture level signal even when position_type is broad.
 
 ### 4.4 Area of Work Insights
 
@@ -193,11 +216,14 @@ Since many postings include multiple states, a single “state” category can�
 
 **Location Field**
 ![Location Field](images/locationfield.png)
+
+The location field isn’t a simple “state” variable; many postings list multiple states in one row, which can represent geographic flexibility (hybrid/remote) rather than ambiguity. Treating it as one category would hide that structure, so we engineered n_states_listed and is_multi_state_posting as a measurable flexibility signal.
+
 ---
 
 ## 5. Feature Engineering Process and Justification (Carrie Feng)
 
-Feature engineering focuses on **creating meaningful new variables** that capture signal not directly represented in the raw columns. The project rubric specifically rewards advanced feature engineering that improves predictive potential through creativity and a deep understanding of feature principles.  
+We realized that a 'Bachelor’s Degree' means something very different if it is 'Required' versus 'Preferred.' We created the 'Education Gap' feature to quantify the aspirational level of a role. Furthermore, we moved beyond the job title by using regex pattern matching to engineer binary 'is_senior' and 'is_manager' flags. This allowed us to mathematically prove what the eye only suspects: the premium IBM places on leadership over technical skill alone.
 
 ### 5.1 Salary Structure Features (Turning “range” into signal)
 
@@ -232,6 +258,10 @@ Hiring cycles and urgency may influence salary bands and role availability over 
 
 ### 5.3 Location Structure Features (Multi-state postings + region)
 
+Multi-state is the norm: ~62.3% of postings list more than one state; the median posting lists 3 states; one posting listed 49 states (effectively nationwide).
+
+Flexibility relates to pay (within Professional roles): Professional postings that are multi-state have a higher median midpoint salary (~$178.5k) than single-state professional postings (~$165.3k).
+
 **Problem:** `state_province` sometimes contains multiple states, which can’t be modeled as a single clean category.
 
 **Engineered features:**
@@ -243,7 +273,7 @@ Hiring cycles and urgency may influence salary bands and role availability over 
 * `primary_region` (coarse mapping: Northeast/Midwest/South/West)
 
 **Why this helps:**
-It captures remote/flexible hiring structure and reduces high-cardinality geographic noise while preserving meaningful geographic patterns.
+In exploratory comparisons, higher-pay professional postings more frequently mentioned cloud and ML keywords (e.g., AWS/Azure/ML) than lower-pay postings, suggesting that text-derived skill features capture useful signal — though causal claims would require a predictive model and validation.
 
 ### 5.4 Education as Ordinal Signal (and “education gap”)
 
@@ -292,6 +322,16 @@ It converts qualitative requirements into quantitative features, enabling analys
 ![Number of skills](images/skillsnumber.png)
 
 Skill density shows a positive relationship with salary, supporting the idea that converting unstructured requirements text into skill indicators captures job complexity.
+
+*** 5.7 Sanity checks and validation of engineered features ***
+
+After engineering features, we validated that they behaved consistently with domain expectations:
+
+Salary transformations: log_mid_salary reduced the long right tail, making group comparisons less dominated by extreme values.
+
+Title seniority flags: median salaries increased in the expected direction for postings flagged as senior/lead/manager compared to entry/intern indicators.
+
+Multi-location flexibility: multi-state postings were common, and treating “multi-state” as a feature preserved signal without exploding the number of location categories.
 ---
 
 ## 6. Summary of Key Findings
