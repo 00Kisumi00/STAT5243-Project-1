@@ -6,7 +6,7 @@ This is repository for Columbia University STAT GR2543 Project 1
 **Dataset:** IBM job postings (web-scraped)
 **Team Members:** Kevin Ma, Shuzhi Yang, Baixuan Chen, Carrie Yan Yin Feng
 **Date:** Feb 2026
-**Github Link:** https://github.com/00Kisumi00/STAT5243-Project-1/tree/main
+**GitHub Link:** [STAT5243-Project-1](https://github.com/00Kisumi00/STAT5243-Project-1/tree/main)
 
 ---
 
@@ -140,27 +140,27 @@ This confirms the dataset contains meaningful real-world incompleteness—especi
 ![Data Overview](images/data overview.png)
 This missingness is not random “noise” — it reflects how companies selectively disclose preferences. Because of that, we preserved missingness intentionally (instead of dropping rows), and later engineered indicators such as has_preferred_edu_specified and safe text handling (empty strings) so models and group comparisons can treat “missing” as meaningful.
 
-### 3.4 Key challenges and how we handled them (new section; paste this)
+### 3.4 Key challenges and how we handled them
 
-Challenge 1 — Salary fields were not numeric (parsing risk).
-The scraped min_salary and max_salary fields arrived as formatted strings, so direct analysis could silently fail (e.g., treating salaries as text, or mis-parsing commas/decimals).
-What we did: we cleaned the salary strings into numeric columns, then validated consistency by checking that max_salary ≥ min_salary across postings (see the min-vs-max validation plot).
-Why it matters: the entire project depends on reliable salary values; this check reduces the chance that later results are driven by parsing errors.
+- **Challenge 1: Salary fields were not numeric (parsing risk).**  
+  **What we saw:** `min_salary` and `max_salary` arrived as formatted strings, so analysis could silently treat them as text or mis-parse commas.  
+  **What we did:** cleaned them into numeric columns and validated consistency by checking `max_salary ≥ min_salary` (see the min-vs-max plot).  
+  **Why it matters:** all salary-based insights (midpoints, ranges, group comparisons) depend on this step.
 
-Challenge 2 — Location was not a single category (multi-state postings).
-Many rows listed multiple states in one cell. Treating each multi-state string as a category would create sparse, hard-to-interpret location groups and inflate the number of levels.
-What we did: instead of forcing one state, we engineered location structure: n_states_listed, is_multi_state_posting, a primary_state, and a coarse primary_region.
-Why it matters: this preserves real variation in geographic flexibility without exploding category count.
+- **Challenge 2: Location was not single-valued (multi-state postings).**  
+  **What we saw:** many postings listed multiple states in one row.  
+  **What we did:** engineered `n_states_listed`, `is_multi_state_posting`, `primary_state`, and `primary_region`.  
+  **Why it matters:** it preserves real flexibility without exploding the number of categories.
 
-Challenge 3 — “Preferred” fields had systematic missingness.
-preferred_education and preferred_technical_experience were missing for a sizable portion of postings. This missingness likely reflects employer posting choices rather than random noise.
-What we did: we avoided dropping these rows; we used consistent placeholders (e.g., “Unknown”) and engineered missingness-aware signals such as has_preferred_edu_specified. For text fields, we used empty strings to avoid breaking text processing.
-Why it matters: this keeps the dataset representative and prevents bias toward postings that are more detailed.
+- **Challenge 3: “Preferred” fields had systematic missingness.**  
+  **What we saw:** preferred education/experience fields were often missing, likely reflecting employer disclosure choices.  
+  **What we did:** avoided dropping rows; used consistent placeholders and missingness-aware features (e.g., `has_preferred_edu_specified`).  
+  **Why it matters:** keeps the dataset representative and avoids bias toward “more detailed” postings.
 
-Challenge 4 — High-cardinality categories.
-Columns like state_province and job_title can produce too many unique values to compare cleanly.
-What we did: we used rare-category pooling for certain categorical variables and relied on engineered abstractions (region; seniority flags; skill indicators) that are interpretable and scalable.
-Why it matters: the report becomes clearer, and future modeling becomes more stable.
+- **Challenge 4: High-cardinality categories.**  
+  **What we saw:** fields like `state_province` and `job_title` can create too many unique levels.  
+  **What we did:** rare-category pooling + engineered abstractions (region, seniority flags, skill indicators).  
+  **Why it matters:** improves interpretability and makes future modeling more stable.
 
 ---
 
@@ -346,15 +346,11 @@ In exploratory comparisons, higher-pay professional postings more frequently men
 
 Skill density shows a positive relationship with salary, supporting the idea that converting unstructured requirements text into skill indicators captures job complexity.
 
-### 5.7 Validation of engineered features 
+### 5.7 Validation of engineered features
 
-After engineering features, we validated that they behaved consistently with domain expectations:
-
-Salary transformations: log_mid_salary reduced the long right tail, making group comparisons less dominated by extreme values.
-
-Title seniority flags: median salaries increased in the expected direction for postings flagged as senior/lead/manager compared to entry/intern indicators.
-
-Multi-location flexibility: multi-state postings were common, and treating “multi-state” as a feature preserved signal without exploding the number of location categories.
+- **Salary transformation:** `log_mid_salary` reduces the long right tail so comparisons are less dominated by extreme values.
+- **Title seniority flags:** median salaries increase in the expected direction for `senior/lead/manager` flags vs `entry/intern`.
+- **Multi-location flexibility:** multi-state postings are common, and treating flexibility as a feature preserves signal without exploding categories.
 
 ### 5.8 What feature engineering revealed (insights from engineered features) (new section; paste this)
 
