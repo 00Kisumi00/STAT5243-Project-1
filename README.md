@@ -1,6 +1,6 @@
 # STAT5243-Project-1
 This is repository for Columbia University STAT GR2543 Project 1
-# Project 1 Report — IBM Job Postings Data Pipeline (Scraping → Cleaning → EDA → Preprocessing → Feature Engineering)
+# Project 1 Report — IBM Job Postings Data Pipeline 
 
 **Course:** STAT5243 — Project 1
 **Dataset:** IBM job postings (web-scraped)
