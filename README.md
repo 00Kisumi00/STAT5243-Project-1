@@ -12,11 +12,11 @@ This is repository for Columbia University STAT GR2543 Project 1
 
 ## 1. Introduction and Dataset Description
 
-This project builds an end-to-end data pipeline on a real-world dataset: acquiring data from an open source via web scraping, then cleaning, exploring, preprocessing, and engineering features to make the dataset suitable for exploratory analysis and future predictive modeling. The goal is to demonstrate practical skills in handling messy data, documenting methodology clearly, and producing actionable insights from raw information. 
+In the rapidly evolving 2026 tech landscape, job postings are more than just advertisements—they are a data-rich reflection of a company's strategic priorities. This project constructs an end-to-end pipeline to analyze 478 IBM job postings. Our goal was to transform 'unstructured corporate noise'—messy strings of multi-state locations and dense technical requirements—into a high-signal dataset. By engineering features like salary midpoints and technical skill flags, we aim to reveal the underlying correlations between educational requirements and compensation tiers at IBM. 
 
 ### 1.1 Dataset Overview
 
-Our dataset consists of **478 IBM job postings** collected from IBM’s job listings during the project period. Each row represents a job posting and includes structured fields describing the role, location, posting date, and salary range.
+The primary challenge was the 'Multi-Location Paradox.' Many IBM roles are not tied to a single office but list multiple states (e.g., 'Illinois, Texas, Indiana, New Jersey') in a single string. Treating these as unique categories would have led to massive data sparsity. We solved this by parsing these strings to count the 'State Breadth' of a role, transforming a messy text field into a numeric indicator of geographic flexibility—a key signal for modern remote-hybrid work models.
 
 **Shape:** 478 rows × 11 columns
 
@@ -146,6 +146,7 @@ Interpretation: compensation is right-skewed and varies strongly by role class a
 
 **Mid-salary Distribution Boxplot**
 ![Mid-salary Distribution](images/midsalarybox.png)
+Because salary is strongly right-skewed, we later engineered a log salary feature (log_mid_salary) to stabilize scale and make relationships easier to compare across groups.
 
 ### 4.2 Job Type Composition
 
@@ -175,6 +176,8 @@ Interpretation: compensation differences across posting type are large and consi
 **Mid-salary By Position**
 ![Mid-salary By Position](images/midsalaryposition.png)
 
+The large gaps between Professional vs Internship/Entry Level suggested that seniority/level signals are critical—motivating our feature engineering that extracts seniority markers directly from job titles.
+
 ### 4.4 Area of Work Insights
 
 Most common `area_of_work` categories included Consulting, Software Engineering, and Infrastructure & Technology. Salary medians varied substantially across these categories, suggesting job function is an important explanatory variable.
@@ -186,14 +189,10 @@ Most common `area_of_work` categories included Consulting, Software Engineering,
 
 The `state_province` column often included **multiple states** in one row (e.g., “Texas, Massachusetts, California”), which indicates flexible or multi-location postings. This motivated our later feature engineering on location structure.
 
+Since many postings include multiple states, a single “state” category can’t represent location well. This led us to engineer features capturing multi-state flexibility and coarse regions instead of treating location as a single label.
+
 **Location Field**
 ![Location Field](images/locationfield.png)
-
-### 4.6 Posting Date Trends
-
-We also examined how postings are distributed over time using date_posted. This helps verify that our scrape covers a coherent time window and can reveal short-term hiring patterns.
-
-Overall, postings appear clustered in certain weeks/months, suggesting hiring activity is not uniform over time. This motivated our feature engineering step that converts posting dates into calendar features (e.g., month, day-of-week).
 ---
 
 ## 5. Feature Engineering Process and Justification (Carrie Feng)
@@ -214,6 +213,7 @@ Feature engineering focuses on **creating meaningful new variables** that captur
 
 **Log_mid_salary**
 ![Log_mid_salary](images/logmidsalary.png)
+The log transform reduces the long right tail in salary and makes patterns across groups (position type, job family, skills) easier to compare.
 
 **Why this helps:**
 Range width can proxy how flexible the role level is, and log transforms reduce skew and improve robustness for future modeling.
@@ -273,6 +273,8 @@ These features are interpretable, strong predictors of pay, and reduce the need 
 **Seniority**
 ![Seniority](images/seniority.png)
 
+The engineered seniority flags behave as expected: postings labeled “senior/lead/manager” show higher median salaries than entry/intern indicators, validating that title parsing captures real compensation structure.
+
 ### 5.6 Skills + Experience from Text (Advanced unstructured feature extraction)
 
 **Problem:** `preferred_technical_experience` is unstructured text.
@@ -288,6 +290,8 @@ It converts qualitative requirements into quantitative features, enabling analys
 
 **Number of Skills**
 ![Number of skills](images/skillsnumber.png)
+
+Skill density shows a positive relationship with salary, supporting the idea that converting unstructured requirements text into skill indicators captures job complexity.
 ---
 
 ## 6. Summary of Key Findings
@@ -345,6 +349,6 @@ It converts qualitative requirements into quantitative features, enabling analys
 
 ## 9. Conclusion
 
-This project demonstrates a complete data pipeline from acquisition to engineered, analysis-ready features. The dataset’s real-world messiness—missing preferred fields, multi-location strings, and unstructured technical experience—made it a strong candidate for advanced feature engineering. The final engineered dataset is more interpretable, more structured for analysis, and better positioned for future predictive modeling tasks, meeting the project’s objectives and evaluation criteria.  
+This project successfully navigated the pipeline from raw web-scraping to an engineered, analysis-ready dataset. Our story ends with a dataset that is no longer just a list of jobs, but a map of IBM’s 2026 priorities. We discovered that while salary logic is consistent (max never exceeds min), the true variance lies in 'unstructured requirements'—where skills like AWS and SQL act as significant salary drivers regardless of job title. The resulting pipeline provides a scalable framework for competitive labor market analysis, proving that with sophisticated feature engineering, even the messiest corporate data can reveal clear economic trends.  
 
 
