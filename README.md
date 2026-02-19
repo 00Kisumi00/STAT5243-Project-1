@@ -54,6 +54,8 @@ Job postings are a strong real-world example of semi-structured data: salary fie
 
 This acquisition approach satisfies the project requirement to obtain data from sources such as web scraping. 
 
+**Scraping Output Snapshot**
+![Scrap Output Snapshot](images/scrap.png)
 ### 2.2 Acquisition Challenges (and how we handled them)
 
 * **Pagination / repeated listings:** Web job portals often show repeating listings across pages. We relied on `job_id` as a stable key for deduplication downstream.
@@ -71,11 +73,18 @@ This section documents the work required to turn raw scraped output into consist
 **Key cleaning actions:**
 
 * **Deduplication:** Removed duplicate job postings using `job_id` as a unique key (**7 duplicated `job_id`s** observed in the raw file).
+
+**Duplicates Removed**
+![Duplicates Removed](images/duplicates.png)
+
 * **Uniform formatting:** Trimmed whitespace in string fields to avoid category fragmentation (e.g., `"Texas"` vs `" Texas"`).
 * **Type correction:** Converted salary fields stored as strings into numeric values; parsed `date_posted` into a datetime.
 * **Missing value handling (baseline):**
 
   * Preserved missingness in optional fields so later preprocessing and modeling can treat “missing” meaningfully rather than overwriting it prematurely.
+
+**Salary fields cleaned**
+![Salary fields cleaned](images/minvsmax.png)
 
 ### 3.2 Preprocessing (Baixuan Chen)
 
@@ -106,6 +115,8 @@ To document data quality issues clearly, we measured missingness rates:
 
 This confirms the dataset contains meaningful real-world incompleteness—especially in “preferred” fields that companies often omit.
 
+**Data Overview**
+![Data Overview](images/data overview.png)
 ---
 
 ## 4. Exploratory Data Analysis (EDA)
