@@ -418,6 +418,7 @@ Mapping education to an ordinal scale and computing the difference between prefe
 * **Baixuan Chen — Preprocessing**
 
   * Implemented preprocessing workflow
+  * Discuss the cleaning part and merge it to the final version
 
 * **Carrie Yan Yin Feng — Feature Engineering & Written Report**
 
