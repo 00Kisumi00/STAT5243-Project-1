@@ -133,7 +133,6 @@ To document data quality issues clearly, we measured missingness rates:
 This confirms the dataset contains meaningful real-world incompleteness—especially in “preferred” fields that companies often omit.
 
 **Data Overview**
-![Data Overview](images/data overview.png)
 This missingness is not random “noise”, it reflects how companies selectively disclose preferences. Because of that, we preserved missingness intentionally (instead of dropping rows), and later engineered indicators such as has_preferred_edu_specified and safe text handling (empty strings) so models and group comparisons can treat “missing” as meaningful.
 
 ### 3.4 Key challenges and how we handled them
