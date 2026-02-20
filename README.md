@@ -65,7 +65,11 @@ A major data issue was that many postings listed multiple states in one row (e.g
 This acquisition approach satisfies the project requirement to obtain data from web scraping. 
 
 **Scraping Output Snapshot**
-![Scrap Output Snapshot](images/scrap.png)
+
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/scrap.png}
+\end{center}
+
 This snapshot demonstrates why web scraping was necessary: key variables (salary ranges, education, and technical experience) are not provided as a clean dataset and must be collected from individual job pages. The result is realistic “messy data”: inconsistent formatting, missing optional fields, and multi-value location strings that require cleaning and feature engineering downstream. 
 
 
