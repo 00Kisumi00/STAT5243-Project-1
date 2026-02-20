@@ -92,7 +92,10 @@ The scraped dataset required substantial cleaning before analysis. Salary fields
 * **Deduplication:** Removed duplicate job postings using `job_id` as a unique key (**7 duplicated `job_id`s** observed in the raw file).
 
 **Duplicates Removed**
-![Duplicates Removed](images/duplicates.png)
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/duplicates.png}
+\end{center}
+
 
 Deduplicating by job_id prevents repeated postings from inflating counts in EDA (e.g., role frequency, location frequency). This matters because later comparisons (salary by role type, skill flags) assume each row is a unique job posting, not a repeated listing.
 
@@ -103,7 +106,9 @@ Deduplicating by job_id prevents repeated postings from inflating counts in EDA 
   * Preserved missingness in optional fields so later preprocessing and modeling can treat “missing” meaningfully rather than overwriting it prematurely.
 
 **Salary fields cleaned**
-![Salary fields cleaned](images/minvsmax.png)
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/minvsmax.png}
+\end{center}
 
 Cleaning salary strings into numeric fields is the foundation for all later analysis. After cleaning, we verified basic consistency (e.g., max_salary is not less than min_salary), which increases confidence that downstream features like mid_salary and salary_range reflect real compensation bands rather than parsing errors.
 
@@ -177,10 +182,14 @@ Salary ranges were often wide:
 Interpretation: compensation is right-skewed and varies strongly by role class and seniority.
 
 **Mid-salary Distribution Histogram**
-![Mid-salary Distribution](images/midsalaryhist.png)
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/midsalaryhist.png}
+\end{center}
 
 **Mid-salary Distribution Boxplot**
-![Mid-salary Distribution](images/midsalarybox.png)
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/midsalarybox.png}
+\end{center}
 
 Takeaway: salary is strongly right-skewed (a small number of high-pay roles stretch the distribution), which is why we later engineered log_mid_salary for more stable comparisons across job groups. 
 
@@ -196,7 +205,9 @@ Posting counts by `position_type`:
 Interpretation: IBM postings in this scrape are dominated by professional roles, but internships and entry-level roles are also well represented, which creates a broad salary spread.
 
 **Job Type Categories**
-![Job Type Categories](images/jobtype.png)
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/jobtype.png}
+\end{center}
 
 ### 4.3 Salary by Position Type
 
@@ -210,7 +221,9 @@ Median midpoint salary by type:
 Interpretation: compensation differences across posting type are large and consistent with expected labor market structure.
 
 **Mid-salary By Position**
-![Mid-salary By Position](images/midsalaryposition.png)
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/midsalaryposition.png}
+\end{center}
 
 The median midpoint gap between Professional (around $174k) and Internship (around $104k) postings is large enough that “level/seniority” is likely a primary driver of pay differences. This motivated our title-based seniority features to capture level signal even when position_type is broad. 
 
@@ -219,7 +232,9 @@ The median midpoint gap between Professional (around $174k) and Internship (arou
 Most common `area_of_work` categories included Consulting, Software Engineering, and Infrastructure & Technology. Salary medians varied substantially across these categories, suggesting job function is an important explanatory variable.
 
 **Area of Work Insights**
-![Area of Work Insights](images/workarea.png)
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/workarea.png}
+\end{center}
 
 ### 4.5 Location Field Complexity
 
@@ -228,7 +243,9 @@ The `state_province` column often included **multiple states** in one row (e.g.,
 Since many postings include multiple states, a single “state” category can’t represent location well. This led us to engineer features capturing multi-state flexibility and coarse regions instead of treating location as a single label.
 
 **Location Field**
-![Location Field](images/locationfield.png)
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/locationfield.png}
+\end{center}
 
 The location field isn’t a simple “state” variable; many postings list multiple states in one row, which can represent geographic flexibility (hybrid/remote) rather than ambiguity. Treating it as one category would hide that structure, so we engineered n_states_listed and is_multi_state_posting as a measurable flexibility signal.
 
@@ -252,7 +269,10 @@ We realized that a 'Bachelor’s Degree' means something very different if it is
 * `log_mid_salary` = log(mid_salary)
 
 **Log_mid_salary**
-![Log_mid_salary](images/logmidsalary.png)
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/logmidsalary.png}
+\end{center}
+
 The log transform reduces the long right tail in salary and makes patterns across groups (position type, job family, skills) easier to compare.
 
 **Why this helps:**
@@ -311,7 +331,9 @@ The issue is that Job title includes strong but hidden salary signals (e.g., Sen
 These features are interpretable, strong predictors of pay, and reduce the need for manual labeling.
 
 **Seniority**
-![Seniority](images/seniority.png)
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/seniority.png}
+\end{center}
 
 The engineered seniority flags behave as expected: postings labeled “senior/lead/manager” show higher median salaries than entry/intern indicators, validating that title parsing captures real compensation structure.
 
@@ -328,7 +350,9 @@ The issue is that  `preferred_technical_experience` is unstructured text.
 In exploratory comparisons, higher-pay professional postings more frequently mentioned cloud and ML keywords (e.g., AWS/Azure/ML) than lower-pay postings, suggesting that text-derived skill features capture useful signal — though causal claims would require a predictive model and validation.
 
 **Number of Skills**
-![Number of skills](images/skillsnumber.png)
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/skillsnumber.png}
+\end{center}
 
 Skill density shows a positive relationship with salary, supporting the idea that converting unstructured requirements text into skill indicators captures job complexity.
 
